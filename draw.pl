@@ -6,35 +6,41 @@ drawBoard([H|T], 0):-
 	write('     1   2   3    4   5   6    7   8   9  \n'),
 	drawBoard([H|T], 1).
 drawBoard([H|_], 9):-
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
+	write('\n   +---+---+---++---+---+---++---+---+---+\n'),
 	write(9),
 	write('  |'),
-	drawLine(H),
-	write('   +---+---+---++---+---+---++---+---+---+\n').
+	drawLine(H, 1),
+	write('\n   +---+---+---++---+---+---++---+---+---+').
 drawBoard([H|T], Y):-
 	0 is Y mod 3,
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
+	write('\n   +---+---+---++---+---+---++---+---+---+\n'),
 	write(Y),
 	write('  |'),
-	drawLine(H),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
+	drawLine(H, 1),
+	write('\n   +---+---+---++---+---+---++---+---+---+'),
 	Yi is Y + 1,
 	drawBoard(T, Yi).
 drawBoard([H|T], Y):-
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
+	write('\n   +---+---+---++---+---+---++---+---+---+\n'),
 	write(Y),
 	write('  |'),
-	drawLine(H),
+	drawLine(H, 1),
 	Yi is Y + 1,
 	drawBoard(T, Yi).
 
-drawLine([H|_]):-
+drawLine([], _).
+drawLine([H|T], X):-
+	0 is X mod 3,
+	X =\= 9,
 	drawCell(H),
-	write('|\n').	
-drawLine([H|T]):-
+	write('||'),
+	Xi is X + 1,
+	drawLine(T, Xi).	
+drawLine([H|T], X):-
 	drawCell(H),
 	write('|'),
-	drawLine(T).
+	Xi is X + 1,
+	drawLine(T, Xi).
 
 drawCell(Cell):-
 	parseCell(Cell, P, Di),
