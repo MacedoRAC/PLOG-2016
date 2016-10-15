@@ -2,56 +2,41 @@
 
 :- use_module(library(lists)).
 
-drawBoard(Board):-
+drawBoard([H|T], 0):-
 	write('     1   2   3    4   5   6    7   8   9  \n'),
+	drawBoard([H|T], 1).
+drawBoard([H|_], 9):-
 	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	drawLine(Board, 1),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	drawLine(Board, 2),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	drawLine(Board, 3),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	drawLine(Board, 4),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	drawLine(Board, 5),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	drawLine(Board, 6),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	drawLine(Board, 7),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	drawLine(Board, 8),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	drawLine(Board, 9),
-	write('   +---+---+---++---+---+---++---+---+---+\n'),
-	write('\n').
-	
-drawLine(Board, L):-
-	getLineHelper(Board, 1, L, Line),
-	write(L),
+	write(9),
 	write('  |'),
-	drawCell(Line, 1),
-	write('|'),
-	drawCell(Line, 2),
-	write('|'),
-	drawCell(Line, 3),
-	write('||'),
-	drawCell(Line, 4),
-	write('|'),
-	drawCell(Line, 5),
-	write('|'),
-	drawCell(Line, 6),
-	write('||'),
-	drawCell(Line, 7),
-	write('|'),
-	drawCell(Line, 8),
-	write('|'),
-	drawCell(Line, 9),
-	write('|\n').
+	drawLine(H),
+	write('   +---+---+---++---+---+---++---+---+---+\n').
+drawBoard([H|T], Y):-
+	0 is Y mod 3,
+	write('   +---+---+---++---+---+---++---+---+---+\n'),
+	write(Y),
+	write('  |'),
+	drawLine(H),
+	write('   +---+---+---++---+---+---++---+---+---+\n'),
+	Yi is Y + 1,
+	drawBoard(T, Yi).
+drawBoard([H|T], Y):-
+	write('   +---+---+---++---+---+---++---+---+---+\n'),
+	write(Y),
+	write('  |'),
+	drawLine(H),
+	Yi is Y + 1,
+	drawBoard(T, Yi).
 
-drawCell(Line, C):-
-	getCellHelper(Line, 1, C, Cell),
+drawLine([H|_]):-
+	drawCell(H),
+	write('|\n').	
+drawLine([H|T]):-
+	drawCell(H),
+	write('|'),
+	drawLine(T).
+
+drawCell(Cell):-
 	parseCell(Cell, P, Di),
 	translateDir(Di, D),
 	colorCell(P, D).
