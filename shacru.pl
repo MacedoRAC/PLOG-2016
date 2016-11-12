@@ -3,7 +3,9 @@
 :- consult('helper.pl').
 :- consult('interface.pl').
 :- consult('draw.pl').
+:- consult('minimax.pl').
 :- use_module(library(lists)).
+:- use_module(library(random)).
 	
 start():-
 	gameOptions(O),
@@ -33,6 +35,9 @@ initBoard2P([[31,22,0,0,0,0,21,0,0],
 		[0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0],
 		[0,0,82,0,0,0,81,0,72]]).
+
+
+
 
 %gameLoop(+Board, +CurrentPlayer, +P1IsCPU, +P2IsCPU, +CPUDificulty)
 gameLoop(B, 0, _, _, _):-
@@ -65,6 +70,32 @@ takeTurn(B, P, Bn):-
 	moveInput(X, Y, D),
 	validateMove(B, P, X, Y, D), ! ; fail,
 	move(B, P, X, Y, D, Bn).
+
+%takeTurnCPU(+Board, +CurrentPlayer, +CPUDificulty, -BoardNew)
+takeTurnCPU(B, P, CPUDificulty, Bn):-
+	repeat,
+	CPUDificulty == 0, ! ; fail,
+	turnCoordsDumCPU(X, Y),
+	moveInput(X, Y, D),
+	validateMove(B, P, X, Y, D), ! ; fail,
+	move(B, P, X, Y, D, Bn).
+
+%takeTurnCPU(+Board, +CurrentPlayer, +CPUDificulty, -BoardNew)
+takeTurnCPU(B, P, CPUDificulty, Bn):-
+	repeat,
+	turnCoordsSmartCPU(B, X, Y),
+	moveInput(X, Y, D),
+	validateMove(B, P, X, Y, D), ! ; fail,
+	move(B, P, X, Y, D, Bn).
+
+%turnCoordsDumCPU(-CoordX, -CoordY)
+turnCoordsDumCPU(B, P, Bn):-
+	random_between(1, 9, X),
+	random_between(1, 9, Y).
+
+%turnCoordsSmartCPU(+Board, -CoordX, -CoordY)
+turnCoordsSmartCPU(B, X, Y):-
+
 
 %validateMove(+Board, +Player, +XCoord, +YCoord, +Direction)
 validateMove(B, P, X, Y, D):-
