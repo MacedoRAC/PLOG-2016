@@ -3,14 +3,13 @@
 :- consult('helper.pl').
 :- consult('interface.pl').
 :- consult('draw.pl').
-:- consult('minimax.pl').
 :- use_module(library(lists)).
 :- use_module(library(random)).
 	
-start():-
+start:-
 	gameOptions(O),
 	newGame(O),
-	start().
+	start.
 
 newGame(0):-
 	halt.
@@ -89,12 +88,13 @@ takeTurnCPU(B, P, CPUDificulty, Bn):-
 	move(B, P, X, Y, D, Bn).
 
 %turnCoordsDumCPU(-CoordX, -CoordY)
-turnCoordsDumCPU(B, P, Bn):-
+turnCoordsDumCPU(X, Y):-
 	random_between(1, 9, X),
 	random_between(1, 9, Y).
 
 %turnCoordsSmartCPU(+Board, -CoordX, -CoordY)
 turnCoordsSmartCPU(B, X, Y):-
+	fail.
 
 
 %validateMove(+Board, +Player, +XCoord, +YCoord, +Direction)

@@ -2,7 +2,7 @@
 
 :- use_module(library(lists)).
 
-greeter():-
+greeter:-
 	write('Welcome to Shacru!\n').
 
 gameOptions(O):-
