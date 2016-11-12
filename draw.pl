@@ -47,11 +47,6 @@ drawCell(Cell):-
 	translateDir(Di, D),
 	colorCell(P, D).
 
-parseCell(C, P, D):-
-	atom_number(C, Cint),
-	P is Cint mod 10,
-	D is Cint div 10.
-
 translateDir(0,' O ').
 translateDir(1,'NW ').
 translateDir(2,' N ').

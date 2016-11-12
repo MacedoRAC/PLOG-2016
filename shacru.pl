@@ -1,60 +1,148 @@
 %prolog
 
 :- consult('helper.pl').
+:- consult('interface.pl').
 :- consult('draw.pl').
 :- use_module(library(lists)).
+	
+start():-
+	gameOptions(O),
+	newGame(O),
+	start().
 
-initBoard([['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0']]).
+newGame(0):-
+	halt.
+newGame(1):-
+	initBoard2P(B),
+	gameLoop(B, false, false, 0).
+newGame(2):-
+	cpuOptions(O),
+	initBoard2P(B),
+	gameLoop(B, false, true, O).
+newGame(3):-
+	cpuOptions(O),
+	initBoard2P(B),
+	gameLoop(B, true, true, O).
+	
+initBoard2P([[51,62,0,0,0,0,61,0,0],
+		[0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0],
+		[42,0,0,0,0,0,0,0,81],
+		[0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0],
+		[0,0,22,0,0,0,21,0,12]]).
 
-initBoard2P([['51','62','0','0','0','0','61','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['42','0','0','0','0','0','0','0','81'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','22','0','0','0','21','0','12']]).
-		
-initBoard3P([['0','0','62','0','61','0','63','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['41','0','0','0','0','0','0','0','81'],
-		['0','0','0','0','0','0','0','0','0'],
-		['42','0','0','0','0','0','0','0','83'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','22','0','0','0','23','0','0']]).
-		
-initBoard4P([['0','0','61','0','62','0','63','0','0'],
-		['0','0','0','0','0','0','0','0','0'],
-		['42','0','0','0','0','0','0','0','82'],
-		['0','0','0','0','0','0','0','0','0'],
-		['41','0','0','0','0','0','0','0','83'],
-		['0','0','0','0','0','0','0','0','0'],
-		['44','0','0','0','0','0','0','0','84'],
-		['0','0','0','0','0','0','0','0','0'],
-		['0','0','21','0','24','0','23','0','0']]).
-		
-		
-demoBoard([['0','0','1','0','2','0','3','0','0'],
-		['0','0','0','1','2','0','3','0','0'],
-		['2','0','1','72','0','0','3','0','82'],
-		['0','2','0','1','0','0','3','0','0'],
-		['41','2','1','0','0','0','3','0','83'],
-		['0','62','0','41','0','0','63','0','0'],
-		['4','0','0','0','0','0','0','0','84'],
-		['0','4','4','0','34','24','0','0','0'],
-		['0','0','21','4','4','0','23','0','0']]).
+%gameLoop(+Board, +CurrentPlayer, +P1IsCPU, +P2IsCPU, +CPUDificulty)
+gameLoop(B, 0, _, _, _):-
+	drawBoard(B, 0),
+	score(B).
+gameLoop(B, 1, false, P2IsCPU, CPUDificulty):-
+	drawBoard(B, 0),
+	takeTurn(B, 1, Bn),
+	nextPlayer(Bn, 1, Pn),
+	gameLoop(Bn, Pn, false, P2IsCPU, CPUDificulty).
+gameLoop(B, 1, true, P2IsCPU, CPUDificulty):-
+	drawBoard(B, 0),
+	takeTurnCPU(B, 1, CPUDificulty, Bn),
+	nextPlayer(Bn, 1, Pn),
+	gameLoop(Bn, Pn, true, P2IsCPU, CPUDificulty).
+gameLoop(B, 2, P1IsCPU, false, CPUDificulty):-
+	drawBoard(B, 0),
+	takeTurn(B, 2, Bn),
+	nextPlayer(Bn, 2, Pn),
+	gameLoop(Bn, Pn, P1IsCPU, false, CPUDificulty).
+gameLoop(B, 2, P1IsCPU, true, CPUDificulty):-
+	drawBoard(B, 0),
+	takeTurnCPU(B, 2, CPUDificulty, Bn),
+	nextPlayer(Bn, 2, Pn),
+	gameLoop(Bn, Pn, P1IsCPU, true, CPUDificulty).
+	
+%takeTurn(+Board, +CurrentPlayer, -BoardNew)
+takeTurn(B, P, Bn):-
+	repeat,
+	moveInut(X, Y, D),
+	validateMove(B, P, X, Y, D),
+	! ; fail,
+	move(B, P, X, Y, D, Bn).
+	%TODO add rotation option
 
-test():-
-	initBoard4P(Bd),
-	drawBoard(Bd, 0).
+%validateMove(+Board, +Player, +XCoord, +YCoord, +Direction)
+validateMove(B, P, X, Y, D):-
+	getCell(B, X, Y, C),
+	parseCell(C, Pi, Di),
+	P == Pi,
+	validateDirection(D, Di),
+	validatePosition(B, X, Y, Di).
+
+%validatePosition(+DirectionFromUser, +DirectionFromCell)
+validateDirection(7, Di):-
+	member(Di,[4,7,8]).
+validateDirection(8, Di):-
+	member(Di,[7,8,9]).
+validateDirection(9, Di):-
+	member(Di,[8,9,6]).
+validateDirection(6, Di):-
+	member(Di,[9,6,3]).
+validateDirection(3, Di):-
+	member(Di,[6,3,2]).
+validateDirection(2, Di):-
+	member(Di,[3,2,1]).
+validateDirection(1, Di):-
+	member(Di,[2,1,4]).
+validateDirection(4, Di):-
+	member(Di,[1,4,7]).
+
+%validatePosition(+Board, +XCoord, +YCoord, +DirectionParsed)
+validatePosition(B, X, Y, D):-
+	genCoords(X, Y, D, Xn, Xf),
+	Xn >= 1, Xn =< 9,
+	Yn >= 1, Yn =< 9,
+	getCell(B, Xn, Yn, C),
+	C == 0.
+
+%genCoords(+XCoord, +YCoord, +Direction, +XCoordNew, +YCoordNew)
+genCoords(X, Y, 7, Xn, Yn):-
+	Xn is X-1,
+	Yn is Y-1.
+genCoords(X, Y, 8, Xn, Yn):-
+	Xn is X,
+	Yn is Y-1.
+genCoords(X, Y, 9, Xn, Yn):-
+	Xn is X+1,
+	Yn is Y-1.
+genCoords(X, Y, 6, Xn, Yn):-
+	Xn is X,
+	Yn is Y+1.
+genCoords(X, Y, 3, Xn, Yn):-
+	Xn is X+1,
+	Yn is Y+1.
+genCoords(X, Y, 2, Xn, Yn):-
+	Xn is X+1,
+	Yn is Y.
+genCoords(X, Y, 1, Xn, Yn):-
+	Xn is X+1,
+	Yn is Y-1.
+genCoords(X, Y, 4, Xn, Yn):-
+	Xn is X,
+	Yn is Y-1.
+	
+%move
+move(B, P, X, Y, D, Bn):-
+	genCoords(X, Y, D, Xi, Yi),
+	setCell(B, X, Y, P, Bi),
+	genCell(P, D, C),
+	setCell(Bi, Xn, Yn, C, Bn).
+	%add rotation here?
+	
+%nextPlayer(+Board, +CurrentPlayer, -NextPlayer)
+nextPlayer(B, 1, Pn):-
+	canPlay(B, P1, P2),
+	(P2 == true, Pn is 2);(P1 == true, Pn is 1);(Pn is 0).
+nextPlayer(B, 2, Pn):-
+	canPlay(B, P1, P2),
+	(P1 == true, Pn is 1);(P2 == true, Pn is 2);(Pn is 0).
+	
+
+
