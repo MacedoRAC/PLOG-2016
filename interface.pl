@@ -5,8 +5,7 @@ getInt(P, I):-
 	repeat,
 	get(C),
 	I is C - 48,
-	member(I, P),
-	! ; fail.
+	(member(I, P), ! ; fail).
 
 greeter():-
 	write('Welcome to Shacru!\n').
@@ -33,4 +32,8 @@ moveInput(X, Y, D):-
 	write('Input the Y position of the piece you want to move [1-9]:\n'),
 	getInt(Y, [1,2,3,4,5,6,7,8,9]),
 	write('Input the Direction in which you want to move (use numpad for reference):\n'),
+	getInt(D, [7,8,9,6,3,2,1,4]).
+
+rotateInput(D):-
+	write('You can rotate the piece you moved 90º CW or CCW. Input the desired direction:\n'),
 	getInt(D, [7,8,9,6,3,2,1,4]).

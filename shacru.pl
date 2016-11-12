@@ -63,8 +63,7 @@ gameLoop(B, 2, P1IsCPU, true, CPUDificulty):-
 takeTurn(B, P, Bn):-
 	repeat,
 	moveInut(X, Y, D),
-	validateMove(B, P, X, Y, D),
-	! ; fail,
+	(validateMove(B, P, X, Y, D), ! ; fail),
 	move(B, P, X, Y, D, Bn).
 	%TODO add rotation option
 
@@ -133,8 +132,18 @@ move(B, P, X, Y, D, Bn):-
 	genCoords(X, Y, D, Xi, Yi),
 	setCell(B, X, Y, P, Bi),
 	genCell(P, D, C),
-	setCell(Bi, Xn, Yn, C, Bn).
+	setCell(Bi, Xn, Yn, C, Bi2).
+	rotation(Bi2, X, Y, Xn, Yn, P, D, Bn).
 	%add rotation here?
+	
+rotation(B, X, Y, Xn, Yn, P, D, Bn):-
+	(member([X, Xn], [[3,4],[4,3],[6,7],[7,6]]) ; member([Y, Yn], [[3,4],[4,3],[6,7],[7,6]])),
+	repeat,
+	rotationInput(Di),
+	(validateDirection(D, Di), ! ; fail),
+	genCell(P, Di, C),
+	setCell(B, Xn, Yn, C, Bn).
+rotation(B,_,_,_,_,_,_,B).
 	
 %nextPlayer(+Board, +CurrentPlayer, -NextPlayer)
 nextPlayer(B, 1, Pn):-
