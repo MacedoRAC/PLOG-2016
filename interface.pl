@@ -1,11 +1,6 @@
 %prolog
 
-%getInt(+ListOfAcceptedValues, -Int)
-getInt(P, I):-
-	repeat,
-	get(C),
-	I is C - 48,
-	(member(I, P), ! ; fail).
+:- use_module(library(lists)).
 
 greeter():-
 	write('Welcome to Shacru!\n').
@@ -28,12 +23,12 @@ cpuOptions(O):-
 	
 moveInput(X, Y, D):-
 	write('Input the X position of the piece you want to move [1-9]:\n'),
-	getInt(X, [1,2,3,4,5,6,7,8,9]),
+	getInt([1,2,3,4,5,6,7,8,9], X),
 	write('Input the Y position of the piece you want to move [1-9]:\n'),
-	getInt(Y, [1,2,3,4,5,6,7,8,9]),
+	getInt([1,2,3,4,5,6,7,8,9], Y),
 	write('Input the Direction in which you want to move (use numpad for reference):\n'),
-	getInt(D, [7,8,9,6,3,2,1,4]).
+	getInt([7,8,9,6,3,2,1,4], D).
 
 rotateInput(D):-
 	write('You can rotate the piece you moved 90º CW or CCW. Input the desired direction:\n'),
-	getInt(D, [7,8,9,6,3,2,1,4]).
+	getInt([7,8,9,6,3,2,1,4], D).

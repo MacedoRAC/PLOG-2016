@@ -1,0 +1,1 @@
+askchar(C) :- repeat, get(C), (C =0'a ; C = 0'1, ! ; fail).

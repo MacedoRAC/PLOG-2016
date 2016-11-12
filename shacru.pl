@@ -14,7 +14,7 @@ newGame(0):-
 	halt.
 newGame(1):-
 	initBoard2P(B),
-	gameLoop(B, false, false, 0).
+	gameLoop(B, 1, false, false, 0).
 newGame(2):-
 	cpuOptions(O),
 	initBoard2P(B),
@@ -24,15 +24,15 @@ newGame(3):-
 	initBoard2P(B),
 	gameLoop(B, true, true, O).
 	
-initBoard2P([[51,62,0,0,0,0,61,0,0],
+initBoard2P([[31,22,0,0,0,0,21,0,0],
 		[0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0],
-		[42,0,0,0,0,0,0,0,81],
+		[62,0,0,0,0,0,0,0,41],
 		[0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0],
-		[0,0,22,0,0,0,21,0,12]]).
+		[0,0,82,0,0,0,81,0,72]]).
 
 %gameLoop(+Board, +CurrentPlayer, +P1IsCPU, +P2IsCPU, +CPUDificulty)
 gameLoop(B, 0, _, _, _):-
@@ -62,10 +62,9 @@ gameLoop(B, 2, P1IsCPU, true, CPUDificulty):-
 %takeTurn(+Board, +CurrentPlayer, -BoardNew)
 takeTurn(B, P, Bn):-
 	repeat,
-	moveInut(X, Y, D),
-	(validateMove(B, P, X, Y, D), ! ; fail),
+	moveInput(X, Y, D),
+	validateMove(B, P, X, Y, D), ! ; fail,
 	move(B, P, X, Y, D, Bn).
-	%TODO add rotation option
 
 %validateMove(+Board, +Player, +XCoord, +YCoord, +Direction)
 validateMove(B, P, X, Y, D):-
@@ -95,7 +94,7 @@ validateDirection(4, Di):-
 
 %validatePosition(+Board, +XCoord, +YCoord, +DirectionParsed)
 validatePosition(B, X, Y, D):-
-	genCoords(X, Y, D, Xn, Xf),
+	genCoords(X, Y, D, Xn, Yn),
 	Xn >= 1, Xn =< 9,
 	Yn >= 1, Yn =< 9,
 	getCell(B, Xn, Yn, C),
@@ -127,15 +126,15 @@ genCoords(X, Y, 4, Xn, Yn):-
 	Xn is X,
 	Yn is Y-1.
 	
-%move
+%move(+Board, +Player, +XCoord, +YCoord, +Direction, -BoardNew)
 move(B, P, X, Y, D, Bn):-
-	genCoords(X, Y, D, Xi, Yi),
+	genCoords(X, Y, D, Xn, Yn),
 	setCell(B, X, Y, P, Bi),
 	genCell(P, D, C),
 	setCell(Bi, Xn, Yn, C, Bi2).
 	rotation(Bi2, X, Y, Xn, Yn, P, D, Bn).
-	%add rotation here?
 	
+%rotation(+Board, +XCoord, +YCoord, +XCoordNew, +YCoordNew, +Player, +Direction, -BoardNew)
 rotation(B, X, Y, Xn, Yn, P, D, Bn):-
 	(member([X, Xn], [[3,4],[4,3],[6,7],[7,6]]) ; member([Y, Yn], [[3,4],[4,3],[6,7],[7,6]])),
 	repeat,
@@ -153,5 +152,6 @@ nextPlayer(B, 2, Pn):-
 	canPlay(B, P1, P2),
 	(P1 == true, Pn is 1);(P2 == true, Pn is 2);(Pn is 0).
 	
+%canPlay(B, P1, P2):-
 
 

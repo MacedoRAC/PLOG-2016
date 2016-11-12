@@ -48,14 +48,14 @@ drawCell(Cell):-
 	colorCell(P, D).
 
 translateDir(0,' O ').
-translateDir(1,'NW ').
-translateDir(2,' N ').
-translateDir(3,' NE').
-translateDir(4,'  E').
-translateDir(5,' SE').
-translateDir(6,' S ').
-translateDir(7,'SW ').
-translateDir(8,'W  ').
+translateDir(7,'NW ').
+translateDir(8,' N ').
+translateDir(9,' NE').
+translateDir(6,'  E').
+translateDir(3,' SE').
+translateDir(2,' S ').
+translateDir(1,'SW ').
+translateDir(4,'W  ').
 
 colorCell(0, _):-
 	write('   ').
