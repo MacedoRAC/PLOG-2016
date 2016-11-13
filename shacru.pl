@@ -59,7 +59,7 @@ gameLoop(B, 1, P1P, P2P, true, P2IsCPU):-
 	drawBoard(B, 0),
 	showPlayer(1),
 	takeTurnCPU(B, 1, P1P, Bn, P1Pn),
-	nextPlayer(Bn, 1, P1P, P2P, Pn),
+	nextPlayer(Bn, 1, P1Pn, P2P, Pn),
 	gameLoop(Bn, Pn, P1Pn, P2P, true, P2IsCPU).
 gameLoop(B, 2, P1P, P2P, P1IsCPU, false):-
 	clear,
@@ -74,7 +74,7 @@ gameLoop(B, 2, P1P, P2P, P1IsCPU, true):-
 	showPlayer(2),
 	takeTurnCPU(B, 2, P2P, Bn, P2Pn),
 	nextPlayer(Bn, 2, P1P, P2Pn, Pn),
-	gameLoop(Bn, Pn, P1P, P2P, P1IsCPU, true).
+	gameLoop(Bn, Pn, P1P, P2Pn, P1IsCPU, true).
 	
 %takeTurn(+Board, +CurrentPlayer, +PlayerPieces, -BoardNew, -PlayerPiecesNew)
 takeTurn(B, P, PP, Bn, PPn):-
@@ -86,13 +86,10 @@ takeTurn(B, P, PP, Bn, PPn):-
 %takeTurnCPU(+Board, +CurrentPlayer, +PlayerPieces, -BoardNew, -PlayerPiecesNew)
 takeTurnCPU(B, P, PP, Bn, PPn):-
 	repeat,
-	moveCPU(PP, X, Y, D),
+	moveInputCPU(PP, X, Y, D),
 	(validateMove(B, P, X, Y, D), ! ; fail),
-	move(B, P, X, Y, D, PP, Bn, PPn).
+	moveCPU(B, P, X, Y, D, PP, Bn, PPn).
 	
-moveCPU(PP, X, Y, D):-
-	random_between(1, 4, P),
-	nth1(P, PP, [X, Y, D]).
 %validateMove(+Board, +Player, +XCoord, +YCoord, +Direction)
 validateMove(B, P, X, Y, D):-
 	getCell(B, X, Y, C),
@@ -137,19 +134,7 @@ move(B, P, X, Y, D, PP, Bn, PPn):-
 	setCell(Bi, Xn, Yn, C, Bi2),
 	append(PPi, [[Xn, Yn, D]], PPn),
 	rotation(Bi2, X, Y, Xn, Yn, P, D, Bn).
-	
-%move(+Board, +Player, +XCoord, +YCoord, +Direction, +PlayerPieces, -BoardNew, -PlayerPiecesNew)
-moveCPU(B, P, X, Y, D, PP, Bn, PPn):-
-	genCoords(X, Y, D, Xn, Yn),
-	setCell(B, X, Y, P, Bi),
-	member([X, Y, Di], PP),
-	delete(PP, [X, Y, Di], PPi),
-	genCell(P, D, C),
-	setCell(Bi, Xn, Yn, C, Bi2),
-	append(PPi, [[Xn, Yn, D]], PPn),
-	describeMoveCPU(P, X, Y, Xn, Yn),
-	rotation(Bi2, X, Y, Xn, Yn, P, D, Bn).
-	
+
 %rotation(+Board, +XCoord, +YCoord, +XCoordNew, +YCoordNew, +Player, +Direction, -BoardNew)
 rotation(B, X, Y, Xn, Yn, P, D, Bn):-
 	(member([X, Xn], [[3,4],[4,3],[6,7],[7,6]]) ; member([Y, Yn], [[3,4],[4,3],[6,7],[7,6]])),
@@ -160,15 +145,33 @@ rotation(B, X, Y, Xn, Yn, P, D, Bn):-
 	setCell(B, Xn, Yn, C, Bn).
 rotation(B,_,_,_,_,_,_,B).
 
+
+moveInputCPU(PP, X, Y, D):-
+	random_between(1, 4, P),
+	nth1(P, PP, [X, Y, D]).
+	
+%move(+Board, +Player, +XCoord, +YCoord, +Direction, +PlayerPieces, -BoardNew, -PlayerPiecesNew)
+moveCPU(B, P, X, Y, D, PP, Bn, PPn):-
+	genCoords(X, Y, D, Xn, Yn),
+	setCell(B, X, Y, P, Bi),
+	member([X, Y, Di], PP),
+	delete(PP, [X, Y, Di], PPi),
+	genCell(P, D, C),
+	setCell(Bi, Xn, Yn, C, Bi2),
+	append(PPi, [[Xn, Yn, D]], PPn),
+	describeMoveCPU(X, Y, Xn, Yn),
+	rotationCPU(Bi2, X, Y, Xn, Yn, P, D, Bn),
+	sleep(2).
+	
 %rotation(+Board, +XCoord, +YCoord, +XCoordNew, +YCoordNew, +Player, +Direction, -BoardNew)
 rotationCPU(B, X, Y, Xn, Yn, P, D, Bn):-
 	(member([X, Xn], [[3,4],[4,3],[6,7],[7,6]]) ; member([Y, Yn], [[3,4],[4,3],[6,7],[7,6]])),
 	repeat,
-	rotateInput(Di),
+	random_between(1, 9, Di),
 	(validateDirection(D, Di), ! ; fail),
 	genCell(P, Di, C),
 	setCell(B, Xn, Yn, C, Bn),
-	describeRotationCPU.
+	describeRotationCPU(Di).
 rotationCPU(B,_,_,_,_,_,_,B).
 	
 %nextPlayer(+Board, +CurrentPlayer, -NextPlayer)

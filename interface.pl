@@ -35,14 +35,19 @@ rotateInput(D):-
 	getInt([7,8,9,6,3,2,1,4], D).
 	
 
-describeMoveCPU(P, X, Y, Xn, Yn):-
-	write('Player '),
-	write(P),
-	write(' (CPU): Moving ['),
+describeMoveCPU(X, Y, Xn, Yn):-
+	write(' (CPU) Moving ['),
 	write(X),
 	write(','),
 	write(Y),
 	write('] to ['),
 	write(Xn),
 	write(','),
-	write(Yn).
+	write(Yn),
+	write('].').
+	
+describeRotationCPU(D):-
+	write(' Rotating to '),
+	translateDir(D, Dir),
+	write(Dir),
+	write('.').
