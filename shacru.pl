@@ -4,26 +4,35 @@
 :- consult('interface.pl').
 :- consult('draw.pl').
 :- use_module(library(lists)).
+:- use_module(library(random)).
 	
-start():-
+start:-
 	gameOptions(O),
 	newGame(O),
-	start().
+	start.
 
 newGame(0):-
 	halt.
 newGame(1):-
+	initP1Pieces(P1P),
+	initP2Pieces(P2P),
 	initBoard2P(B),
-	gameLoop(B, 1, false, false, 0).
+	gameLoop(B, 1, P1P, P2P, false, false).
 newGame(2):-
-	cpuOptions(O),
+	initP1Pieces(P1P),
+	initP2Pieces(P2P),
 	initBoard2P(B),
-	gameLoop(B, false, true, O).
+	gameLoop(B, 1, P1P, P2P,  false, true).
 newGame(3):-
-	cpuOptions(O),
+	initP1Pieces(P1P),
+	initP2Pieces(P2P),
 	initBoard2P(B),
-	gameLoop(B, true, true, O).
+	gameLoop(B, 1, P1P, P2P, true, true).
 	
+	
+initP1Pieces([[1,1,3],[7,1,2],[9,5,4],[7,9,8]]).
+initP2Pieces([[2,1,2],[1,5,6],[3,9,8],[9,9,7]]).
+
 initBoard2P([[31,22,0,0,0,0,21,0,0],
 		[0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0],
@@ -34,45 +43,63 @@ initBoard2P([[31,22,0,0,0,0,21,0,0],
 		[0,0,0,0,0,0,0,0,0],
 		[0,0,82,0,0,0,81,0,72]]).
 
-%gameLoop(+Board, +CurrentPlayer, +P1IsCPU, +P2IsCPU, +CPUDificulty)
-gameLoop(B, 0, _, _, _):-
+%gameLoop(+Board, +CurrentPlayer, +P1Pieces, +P2Pieces +P1IsCPU, +P2IsCPU)
+gameLoop(B, 0, _, _, _, _):-
+	drawBoard(B, 0).
+	%score(B).
+gameLoop(B, 1, P1P, P2P, false, P2IsCPU):-
+	clear,
 	drawBoard(B, 0),
-	score(B).
-gameLoop(B, 1, false, P2IsCPU, CPUDificulty):-
+	showPlayer(1),
+	takeTurn(B, 1, P1P, Bn, P1Pn),
+	nextPlayer(Bn, 1, P1Pn, P2P, Pn),
+	gameLoop(Bn, Pn, P1Pn, P2P, false, P2IsCPU).
+gameLoop(B, 1, P1P, P2P, true, P2IsCPU):-
+	clear,
 	drawBoard(B, 0),
-	takeTurn(B, 1, Bn),
-	nextPlayer(Bn, 1, Pn),
-	gameLoop(Bn, Pn, false, P2IsCPU, CPUDificulty).
-gameLoop(B, 1, true, P2IsCPU, CPUDificulty):-
+	showPlayer(1),
+	takeTurnCPU(B, 1, P1P, Bn, P1Pn),
+	nextPlayer(Bn, 1, P1P, P2P, Pn),
+	gameLoop(Bn, Pn, P1Pn, P2P, true, P2IsCPU).
+gameLoop(B, 2, P1P, P2P, P1IsCPU, false):-
+	clear,
 	drawBoard(B, 0),
-	takeTurnCPU(B, 1, CPUDificulty, Bn),
-	nextPlayer(Bn, 1, Pn),
-	gameLoop(Bn, Pn, true, P2IsCPU, CPUDificulty).
-gameLoop(B, 2, P1IsCPU, false, CPUDificulty):-
+	showPlayer(2),
+	takeTurn(B, 2, P2P, Bn, P2Pn),
+	nextPlayer(Bn, 2, P1P, P2Pn, Pn),
+	gameLoop(Bn, Pn, P1P, P2Pn, P1IsCPU, false).
+gameLoop(B, 2, P1P, P2P, P1IsCPU, true):-
+	clear,
 	drawBoard(B, 0),
-	takeTurn(B, 2, Bn),
-	nextPlayer(Bn, 2, Pn),
-	gameLoop(Bn, Pn, P1IsCPU, false, CPUDificulty).
-gameLoop(B, 2, P1IsCPU, true, CPUDificulty):-
-	drawBoard(B, 0),
-	takeTurnCPU(B, 2, CPUDificulty, Bn),
-	nextPlayer(Bn, 2, Pn),
-	gameLoop(Bn, Pn, P1IsCPU, true, CPUDificulty).
+	showPlayer(2),
+	takeTurnCPU(B, 2, P2P, Bn, P2Pn),
+	nextPlayer(Bn, 2, P1P, P2Pn, Pn),
+	gameLoop(Bn, Pn, P1P, P2P, P1IsCPU, true).
 	
-%takeTurn(+Board, +CurrentPlayer, -BoardNew)
-takeTurn(B, P, Bn):-
+%takeTurn(+Board, +CurrentPlayer, +PlayerPieces, -BoardNew, -PlayerPiecesNew)
+takeTurn(B, P, PP, Bn, PPn):-
 	repeat,
 	moveInput(X, Y, D),
-	validateMove(B, P, X, Y, D), ! ; fail,
-	move(B, P, X, Y, D, Bn).
-
+	(validateMove(B, P, X, Y, D), ! ; fail),
+	move(B, P, X, Y, D, PP, Bn, PPn).
+	
+%takeTurnCPU(+Board, +CurrentPlayer, +PlayerPieces, -BoardNew, -PlayerPiecesNew)
+takeTurnCPU(B, P, PP, Bn, PPn):-
+	repeat,
+	moveCPU(PP, X, Y, D),
+	(validateMove(B, P, X, Y, D), ! ; fail),
+	move(B, P, X, Y, D, PP, Bn, PPn).
+	
+moveCPU(PP, X, Y, D):-
+	random_between(1, 4, P),
+	nth1(P, PP, [X, Y, D]).
 %validateMove(+Board, +Player, +XCoord, +YCoord, +Direction)
 validateMove(B, P, X, Y, D):-
 	getCell(B, X, Y, C),
 	parseCell(C, Pi, Di),
 	P == Pi,
 	validateDirection(D, Di),
-	validatePosition(B, X, Y, Di).
+	validatePosition(B, X, Y, D).
 
 %validatePosition(+DirectionFromUser, +DirectionFromCell)
 validateDirection(7, Di):-
@@ -99,59 +126,102 @@ validatePosition(B, X, Y, D):-
 	Yn >= 1, Yn =< 9,
 	getCell(B, Xn, Yn, C),
 	C == 0.
-
-%genCoords(+XCoord, +YCoord, +Direction, +XCoordNew, +YCoordNew)
-genCoords(X, Y, 7, Xn, Yn):-
-	Xn is X-1,
-	Yn is Y-1.
-genCoords(X, Y, 8, Xn, Yn):-
-	Xn is X,
-	Yn is Y-1.
-genCoords(X, Y, 9, Xn, Yn):-
-	Xn is X+1,
-	Yn is Y-1.
-genCoords(X, Y, 6, Xn, Yn):-
-	Xn is X,
-	Yn is Y+1.
-genCoords(X, Y, 3, Xn, Yn):-
-	Xn is X+1,
-	Yn is Y+1.
-genCoords(X, Y, 2, Xn, Yn):-
-	Xn is X+1,
-	Yn is Y.
-genCoords(X, Y, 1, Xn, Yn):-
-	Xn is X+1,
-	Yn is Y-1.
-genCoords(X, Y, 4, Xn, Yn):-
-	Xn is X,
-	Yn is Y-1.
 	
-%move(+Board, +Player, +XCoord, +YCoord, +Direction, -BoardNew)
-move(B, P, X, Y, D, Bn):-
+%move(+Board, +Player, +XCoord, +YCoord, +Direction, +PlayerPieces, -BoardNew, -PlayerPiecesNew)
+move(B, P, X, Y, D, PP, Bn, PPn):-
 	genCoords(X, Y, D, Xn, Yn),
 	setCell(B, X, Y, P, Bi),
+	member([X, Y, Di], PP),
+	delete(PP, [X, Y, Di], PPi),
 	genCell(P, D, C),
-	setCell(Bi, Xn, Yn, C, Bi2).
+	setCell(Bi, Xn, Yn, C, Bi2),
+	append(PPi, [[Xn, Yn, D]], PPn),
+	rotation(Bi2, X, Y, Xn, Yn, P, D, Bn).
+	
+%move(+Board, +Player, +XCoord, +YCoord, +Direction, +PlayerPieces, -BoardNew, -PlayerPiecesNew)
+moveCPU(B, P, X, Y, D, PP, Bn, PPn):-
+	genCoords(X, Y, D, Xn, Yn),
+	setCell(B, X, Y, P, Bi),
+	member([X, Y, Di], PP),
+	delete(PP, [X, Y, Di], PPi),
+	genCell(P, D, C),
+	setCell(Bi, Xn, Yn, C, Bi2),
+	append(PPi, [[Xn, Yn, D]], PPn),
+	describeMoveCPU(P, X, Y, Xn, Yn),
 	rotation(Bi2, X, Y, Xn, Yn, P, D, Bn).
 	
 %rotation(+Board, +XCoord, +YCoord, +XCoordNew, +YCoordNew, +Player, +Direction, -BoardNew)
 rotation(B, X, Y, Xn, Yn, P, D, Bn):-
 	(member([X, Xn], [[3,4],[4,3],[6,7],[7,6]]) ; member([Y, Yn], [[3,4],[4,3],[6,7],[7,6]])),
 	repeat,
-	rotationInput(Di),
+	rotateInput(Di),
 	(validateDirection(D, Di), ! ; fail),
 	genCell(P, Di, C),
 	setCell(B, Xn, Yn, C, Bn).
 rotation(B,_,_,_,_,_,_,B).
+
+%rotation(+Board, +XCoord, +YCoord, +XCoordNew, +YCoordNew, +Player, +Direction, -BoardNew)
+rotationCPU(B, X, Y, Xn, Yn, P, D, Bn):-
+	(member([X, Xn], [[3,4],[4,3],[6,7],[7,6]]) ; member([Y, Yn], [[3,4],[4,3],[6,7],[7,6]])),
+	repeat,
+	rotateInput(Di),
+	(validateDirection(D, Di), ! ; fail),
+	genCell(P, Di, C),
+	setCell(B, Xn, Yn, C, Bn),
+	describeRotationCPU.
+rotationCPU(B,_,_,_,_,_,_,B).
 	
 %nextPlayer(+Board, +CurrentPlayer, -NextPlayer)
-nextPlayer(B, 1, Pn):-
-	canPlay(B, P1, P2),
-	(P2 == true, Pn is 2);(P1 == true, Pn is 1);(Pn is 0).
-nextPlayer(B, 2, Pn):-
-	canPlay(B, P1, P2),
-	(P1 == true, Pn is 1);(P2 == true, Pn is 2);(Pn is 0).
+nextPlayer(B, 1, P1P, P2P, Pn):-
+	(canPlay(B, P2P), Pn is 2);
+	(canPlay(B, P1P), Pn is 1);
+	Pn is 0,!.
+nextPlayer(B, 2, P1P, P2P, Pn):-
+	(canPlay(B, P1P), Pn is 1);
+	(canPlay(B, P2P), Pn is 2);
+	(not(canPlay(B, P1P)), not(canPlay(B, P2P)), Pn is 0),!.
+
+canPlay(B, [PP1, PP2, PP3, PP4]):-
+	hasMoves(B, PP1);
+	hasMoves(B, PP2);
+	hasMoves(B, PP3);
+	hasMoves(B, PP4),
+	!.
 	
-%canPlay(B, P1, P2):-
-
-
+hasMoves(B, [X, Y, 7]):-
+	hasMovesHelper(B, X, Y, 4);
+	hasMovesHelper(B, X, Y, 7);
+	hasMovesHelper(B, X, Y, 8), !.
+hasMoves(B, [X, Y, 8]):-
+	hasMovesHelper(B, X, Y, 7);
+	hasMovesHelper(B, X, Y, 8);
+	hasMovesHelper(B, X, Y, 9), !.
+hasMoves(B, [X, Y, 9]):-
+	hasMovesHelper(B, X, Y, 8);
+	hasMovesHelper(B, X, Y, 9);
+	hasMovesHelper(B, X, Y, 6), !.
+hasMoves(B, [X, Y, 6]):-
+	hasMovesHelper(B, X, Y, 9);
+	hasMovesHelper(B, X, Y, 6);
+	hasMovesHelper(B, X, Y, 3), !.
+hasMoves(B, [X, Y, 3]):-
+	hasMovesHelper(B, X, Y, 6);
+	hasMovesHelper(B, X, Y, 3);
+	hasMovesHelper(B, X, Y, 2), !.
+hasMoves(B, [X, Y, 2]):-
+	hasMovesHelper(B, X, Y, 3);
+	hasMovesHelper(B, X, Y, 2);
+	hasMovesHelper(B, X, Y, 1), !.
+hasMoves(B, [X, Y, 1]):-
+	hasMovesHelper(B, X, Y, 2);
+	hasMovesHelper(B, X, Y, 1);
+	hasMovesHelper(B, X, Y, 4), !.
+hasMoves(B, [X, Y, 4]):-
+	hasMovesHelper(B, X, Y, 1);
+	hasMovesHelper(B, X, Y, 4);
+	hasMovesHelper(B, X, Y, 7), !.
+	
+hasMovesHelper(B, X, Y, D):-
+	genCoords(X, Y, D, Xn, Yn),
+	getCell(B, Xn, Yn, C),
+	C == 0.

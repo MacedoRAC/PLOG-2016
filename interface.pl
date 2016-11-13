@@ -2,8 +2,16 @@
 
 :- use_module(library(lists)).
 
-greeter():-
+clear:-
+	write('\33\[H\33\[2J').
+
+greeter:-
 	write('Welcome to Shacru!\n').
+	
+showPlayer(1):-
+	write('\n\nPlayer 1 (Green):\n').
+showPlayer(2):-
+	write('\n\nPlayer 2 (Red):\n').
 
 gameOptions(O):-
 	write('Please choose a game mode:\n'),
@@ -13,13 +21,6 @@ gameOptions(O):-
 	write('\t0 Exit\n'),
 	write('Option: '),
 	getInt([0,1,2,3], O).
-
-cpuOptions(O):-
-	write('Choose the CPU dificulty:\n'),
-	write('\t1 Easy\n'),
-	write('\t2 Hard\n'),
-	write('Option: '),
-	getInt([1,2], O).
 	
 moveInput(X, Y, D):-
 	write('Input the X position of the piece you want to move [1-9]:\n'),
@@ -32,3 +33,16 @@ moveInput(X, Y, D):-
 rotateInput(D):-
 	write('You can rotate the piece you moved 90º CW or CCW. Input the desired direction:\n'),
 	getInt([7,8,9,6,3,2,1,4], D).
+	
+
+describeMoveCPU(P, X, Y, Xn, Yn):-
+	write('Player '),
+	write(P),
+	write(' (CPU): Moving ['),
+	write(X),
+	write(','),
+	write(Y),
+	write('] to ['),
+	write(Xn),
+	write(','),
+	write(Yn).

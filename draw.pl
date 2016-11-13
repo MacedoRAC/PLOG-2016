@@ -3,7 +3,7 @@
 :- use_module(library(lists)).
 
 drawBoard([H|T], 0):-
-	write('     1   2   3    4   5   6    7   8   9  \n'),
+	write('\n     1   2   3    4   5   6    7   8   9  \n'),
 	drawBoard([H|T], 1).
 drawBoard([H|_], 9):-
 	write('\n   +---+---+---++---+---+---++---+---+---+\n'),
@@ -21,6 +21,7 @@ drawBoard([H|T], Y):-
 	Yi is Y + 1,
 	drawBoard(T, Yi).
 drawBoard([H|T], Y):-
+	Y =< 9,
 	write('\n   +---+---+---++---+---+---++---+---+---+\n'),
 	write(Y),
 	write('  |'),
@@ -37,6 +38,7 @@ drawLine([H|T], X):-
 	Xi is X + 1,
 	drawLine(T, Xi).	
 drawLine([H|T], X):-
+	X =< 9,
 	drawCell(H),
 	write('|'),
 	Xi is X + 1,
