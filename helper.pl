@@ -8,7 +8,7 @@ getInt(P, I):-
 	get(C),
 	I is C - 48,
 	member(I, P), ! ; fail.
-
+%getCell(+Board, +XCoord, +YCoord, -Cell)
 getCell(B, X, Y, C):-
 	getLineHelper(B, 1, Y, L),
 	getCellHelper(L, 1, X, C).
@@ -28,39 +28,10 @@ getCellHelper([_|T], Xi, Xf, C):-
 	Xi \= Xf,
 	Xn is Xi+1,
 	getCellHelper(T, Xn, Xf, C).
-	
+
+%getCell(+Board, +XCoord, +YCoord, +Cell, -BoardNew)	
 setCell(B, X, Y, C, Bn):-
 	setCellHelper(B, 1, 1, X, Y, C, Bn).
-	
-% setCellHelper([],_,_,_,_,_,[]).
-% setCellHelper([[_|_]|_], Xi, Yi, Xf, Yf, C, [C]):-
-	% Xi == 9,
-	% Yi == 9,
-	% Xi == Xf,
-	% Yi == Yf.
-% setCellHelper([[H|_]|L], Xi, Yi, Xf, Yf, C, [[C]|Ln]):-
-	% Xi == 9,
-	% Xi == Xf,
-	% Yi == Yf,
-	% Xn is 1,
-	% Yn is Yi+1,
-	% setCellHelper(L, Xn, Yn, Xf, Yf, C, Ln).
-% setCellHelper([[H|T]|L], Xi, Yi, Xf, Yf, C, [[C|Tn]|Ln]):-
-	% Xi == Xf,
-	% Yi == Yf,
-	% Xn is Xi+1,
-	% setCellHelper([T|L], Xn, Yi, Xf, Yf, C, [Tn|Ln]).
-% setCellHelper([[H|_]|_], Xi, Yi, Xf, Yf, _, [H]):-
-	% Xi == 9,
-	% Yi == 9.
-% setCellHelper([[H|_]|L], Xi, Yi, Xf, Yf, C, [[H]|Ln]):-
-	% Xi == 9,
-	% Xn is 1,
-	% Yn is Yi+1,
-	% setCellHelper(L, Xn, Yn, Xf, Yf, C, Ln).
-% setCellHelper([[H|T]|L], Xi, Yi, Xf, Yf, C, [[H|Tn]|Ln]):-
-	% Xn is Xi+1,
-	% setCellHelper([T|L], Xn, Yi, Xf, Yf, C, [Tn|Ln]).
 
 setCellHelper([],_,_,_,_,_,[]).
 setCellHelper([[_|T]|L], Xi, Yi, Xf, Yf, C, [[C|T]|L]):-

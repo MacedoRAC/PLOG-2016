@@ -32,7 +32,7 @@ drawBoard([H|T], Y):-
 drawLine([], _).
 drawLine([H|T], X):-
 	0 is X mod 3,
-	X =\= 9,
+	X \= 9,
 	drawCell(H),
 	write('||'),
 	Xi is X + 1,

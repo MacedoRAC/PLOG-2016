@@ -6,7 +6,8 @@ clear:-
 	write('\33\[H\33\[2J').
 
 greeter:-
-	write('Welcome to Shacru!\n').
+	write('Welcome to Shacru!\n'),
+	flush_output.
 	
 showPlayer(1):-
 	write('\n\nPlayer 1 (Green):\n').
@@ -36,7 +37,7 @@ rotateInput(D):-
 	
 
 describeMoveCPU(X, Y, Xn, Yn):-
-	write(' (CPU) Moving ['),
+	write('(CPU) Moving ['),
 	write(X),
 	write(','),
 	write(Y),
@@ -44,10 +45,21 @@ describeMoveCPU(X, Y, Xn, Yn):-
 	write(Xn),
 	write(','),
 	write(Yn),
-	write('].').
+	write('].'),
+	flush_output.
 	
 describeRotationCPU(D):-
 	write(' Rotating to '),
 	translateDir(D, Dir),
 	write(Dir),
-	write('.').
+	write('.'),
+	flush_output.
+	
+printScore(SP1, SP2):-
+	SP1 > SP2,
+	write('Player 1 won with '),
+	write(SP1),
+	write(' points! Player 2 scored '),
+	write(SP2),
+	write(' points.\n'),
+	flush_output.
