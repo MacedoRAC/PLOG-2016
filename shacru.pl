@@ -46,7 +46,7 @@ initBoard2P([[31,22,0,0,0,0,21,0,0],
 %gameLoop(+Board, +CurrentPlayer, +P1Pieces, +P2Pieces +P1IsCPU, +P2IsCPU)
 gameLoop(B, 0, _, _, _, _):-
 	drawBoard(B, 0).
-	%score(B).
+	score(B).
 gameLoop(B, 1, P1P, P2P, false, P2IsCPU):-
 	clear,
 	drawBoard(B, 0),
@@ -71,7 +71,7 @@ gameLoop(B, 2, P1P, P2P, P1IsCPU, false):-
 gameLoop(B, 2, P1P, P2P, P1IsCPU, true):-
 	clear,
 	drawBoard(B, 0),
-	showPlayer(2),
+	%showPlayer(2),
 	takeTurnCPU(B, 2, P2P, Bn, P2Pn),
 	nextPlayer(Bn, 2, P1P, P2Pn, Pn),
 	gameLoop(Bn, Pn, P1P, P2Pn, P1IsCPU, true).
@@ -228,3 +228,29 @@ hasMovesHelper(B, X, Y, D):-
 	genCoords(X, Y, D, Xn, Yn),
 	getCell(B, Xn, Yn, C),
 	C == 0.
+
+score(B):-
+	scoreHelper(B, 0, 0).
+	
+scoreHelper([], SP1, SP2):-
+	printScore(SP1, SP2).
+scoreHelper([[H]|L], SP1, SP2):-
+	parseCell(H, P, D),
+	P == 1,
+	SP1n is SP1+1,
+	scoreHelper(L, SP1n, SP2).
+scoreHelper([[H]|L], SP1, SP2):-
+	parseCell(H, P, D),
+	P == 2,
+	SP2n is SP2+1,
+	scoreHelper(L, SP1, SP2n).
+scoreHelper([[H|T]|L], SP1, SP2):-
+	parseCell(H, P, D),
+	P == 1,
+	SP1n is SP1+1,
+	scoreHelper([[T]|L], SP1n, SP2).
+scoreHelper([[H|T]|L], SP1, SP2):-
+	parseCell(H, P, D),
+	P == 2,
+	SP2n is SP2+1,
+	scoreHelper([[T]|L], SP1, SP2n).

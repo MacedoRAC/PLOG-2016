@@ -10,7 +10,7 @@ drawBoard([H|_], 9):-
 	write(9),
 	write('  |'),
 	drawLine(H, 1),
-	write('\n   +---+---+---++---+---+---++---+---+---+').
+	write('\n   +---+---+---++---+---+---++---+---+---+\n').
 drawBoard([H|T], Y):-
 	0 is Y mod 3,
 	write('\n   +---+---+---++---+---+---++---+---+---+\n'),
@@ -21,7 +21,7 @@ drawBoard([H|T], Y):-
 	Yi is Y + 1,
 	drawBoard(T, Yi).
 drawBoard([H|T], Y):-
-	Y =< 9,
+	Y < 9,
 	write('\n   +---+---+---++---+---+---++---+---+---+\n'),
 	write(Y),
 	write('  |'),
